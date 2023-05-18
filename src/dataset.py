@@ -31,11 +31,7 @@ def mergeForecastDataset():
             print(df)
             df = df.loc[:, ['timestamp', 'value']]
             allYears = pd.concat([df, allYears])
-<<<<<<< HEAD
-        allYears.to_csv("assets/output/부림동_" + fileName + '.csv')
-=======
         allYears.to_csv("assets/output/부림동_" + fileName + ".csv")
->>>>>>> 5c2a4ae070f482e78e1ebdce3966f497e6849203
 
 
 # Visitor
@@ -48,11 +44,7 @@ def makeVisitor():
     for year in years:
         try:
             data = pd.read_excel(
-<<<<<<< HEAD
                 'assets/input/SGPyear/Visitor_'+year+'.xlsx', skiprows=2, usecols=[0, 5])
-=======
-                './assets/input/SGPyear/Visitor_'+year+'.xlsx', skiprows=2, usecols=[0, 5])
->>>>>>> 5c2a4ae070f482e78e1ebdce3966f497e6849203
         except FileNotFoundError:
             print("Error: File not found!")
             continue
@@ -65,11 +57,8 @@ def makeVisitor():
         data.columns = ['date', 'visitor']
         visitor = pd.concat([data, visitor])
     visitor.reset_index(inplace=True, drop=True)
-<<<<<<< HEAD
     visitor.to_csv("assets/output/visitors.csv")
-=======
-    visitor.to_csv("./assets/output/visitors.csv")
->>>>>>> 5c2a4ae070f482e78e1ebdce3966f497e6849203
+
 
 def makeAtmosphere():
     years = ['2008' , '2009', '2010', '2011', '2012', '2013', '2014',
@@ -78,15 +67,10 @@ def makeAtmosphere():
     atmosphere = pd.DataFrame()
     for year in years:
         try:
-<<<<<<< HEAD
             if year == '2018' or year == '2019':
                 data = pd.read_csv('assets/input/Atmosphere/Atmosphere_'+year+'.csv', encoding='cp949', usecols=range(1,12))
             else:
                 data = pd.read_csv('assets/input/Atmosphere/Atmosphere_'+year+'.csv', encoding='cp949')
-=======
-            data = pd.read_csv(
-                './assets/input/Atmosphere/Atmosphere_'+year+'.csv', encoding='cp949')
->>>>>>> 5c2a4ae070f482e78e1ebdce3966f497e6849203
             data.columns = ['city', 'town', 'established', 'position', 'timestamp', 
                                 'sulfur_dioxide', 'carbon_monoxide', 'ozone', 'nitrogen_dioxide', 
                                 'fine_dust_pm10', 'fine_dust_pm2.5']
@@ -113,10 +97,8 @@ def makeAtmosphere():
 
         atmosphere = pd.concat([df, atmosphere])
     atmosphere.reset_index(inplace=True, drop=True)
-<<<<<<< HEAD
     atmosphere.to_csv("assets/output/atmosphere.csv", encoding='cp949')
-=======
-    atmosphere.to_csv("./assets/output/atmosphere.csv", encoding='cp949')
+
 
 def addOutputDataset() :
     for fileName in fileNames:
@@ -146,4 +128,3 @@ def addOutputDataset() :
 
 #df['Mean'] = df.groupby(['date'])['value'].transfrom('mean')
 #            df["Mean"] = df.groupby('date')['value'].mean()
->>>>>>> 5c2a4ae070f482e78e1ebdce3966f497e6849203

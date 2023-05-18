@@ -10,7 +10,7 @@ fileNames = ['6시간강수량', '강수확률', '습도',
 # Read the csv files in the assets/input and merge all of features
 
 
-def makeOutputDataset():
+def mergeForecastDataset():
     for fileName in fileNames:
         allYears = pd.DataFrame()
 
@@ -33,6 +33,3 @@ def makeOutputDataset():
             allYears = pd.concat([df, allYears])
 
         allYears.to_csv("./assets/output/부림동_" + fileName + ".csv")
-
-
-makeOutputDataset()

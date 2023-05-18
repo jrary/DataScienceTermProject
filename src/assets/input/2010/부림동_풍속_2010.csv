@@ -1,4 +1,4 @@
-year,month, format: day,hour,forecast,value  location:60_124 Start : 20100101 ,date,addDate,timeStamp
+year,month,day,hour,forecast,value,date,addDate,timeStamp
 ,0,,,,,,,
 2010,1,1,200,4,1.5,2010-01-01,0,2010-01-01
 2010,1,1,200,7,1,2010-01-01,0,2010-01-01

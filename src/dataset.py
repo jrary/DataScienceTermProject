@@ -1,10 +1,13 @@
 import pandas as pd
 import numpy as np
 
+# Define the file names and directory
 inputDirs = ['2009', '2010', '2011', '2012', '2013', '2014',
              '2015', '2016', '2017', '2017_1', '2018', '2019']
 fileNames = ['6시간강수량', '강수확률', '습도',
              '일최고기온', '일최저기온', '풍속', '풍향', '하늘상태']
+
+# Read the csv files in the assets/input and merge all of features
 
 
 def makeOutputDataset():

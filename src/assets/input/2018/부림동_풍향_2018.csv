@@ -1,4 +1,4 @@
-year,month, format: day,hour,forecast,value  location:60_124 Start : 20180201 ,date,addDate,timestamp
+year,month,day,hour,forecast,value,date,addDate,timestamp
 2018,2,1,200,4,317,2018-02-01,0,2018-02-01
 2018,2,1,200,7,325,2018-02-01,0,2018-02-01
 2018,2,1,200,10,287,2018-02-01,0,2018-02-01

@@ -1,4 +1,4 @@
-year,month,day,hour,forecast,value,date,addDate,timeStamp
+year,month,day,hour,forecast,value,date,addDate,timestamp
 2011,1,1,200,4,-3.9,2011-01-01,0,2011-01-01
 2011,1,1,200,7,-2.9,2011-01-01,0,2011-01-01
 2011,1,1,500,4,-3.9,2011-01-01,0,2011-01-01

@@ -1,4 +1,4 @@
-year,month,day,hour,forecast,value,date,addDate,timetsamp
+year,month,day,hour,forecast,value,date,addDate,timestamp
 2013,1,1,200,4,290,2013.1.1,0,2013.1.1
 2013,1,1,200,7,217,2013.1.1,0,2013.1.1
 2013,1,1,200,10,225,2013.1.1,0,2013.1.1

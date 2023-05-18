@@ -17,7 +17,7 @@ def makeOutputDataset():
         for dir in inputDirs:
             str = 'assets/input/' + dir+'/부림동_' + fileName + '_'+dir+'.csv'
             try:
-                df = pd.read_csv('./src/assets/input/' + dir+'/부림동_' +
+                df = pd.read_csv('./assets/input/' + dir+'/부림동_' +
                                  fileName + '_'+dir+'.csv')
             except FileNotFoundError:
                 print("Error: File not found!")
@@ -32,7 +32,7 @@ def makeOutputDataset():
             df = df.loc[:, ['timestamp', 'value']]
             allYears = pd.concat([df, allYears])
 
-        allYears.to_csv("./src/assets/output/부림동_" + fileName + ".csv")
+        allYears.to_csv("./assets/output/부림동_" + fileName + ".csv")
 
 
 makeOutputDataset()

@@ -95,3 +95,32 @@ def makeAtmosphere():
         atmosphere = pd.concat([data, atmosphere])
     atmosphere.reset_index(inplace=True, drop=True)
     atmosphere.to_csv("./assets/output/atmosphere.csv", encoding='cp949')
+
+def addOutputDataset() :
+    for fileName in fileNames:
+        allYears = pd.DataFrame()
+
+        for dir in inputDirs:
+            str = 'assets/input/' + dir+'/부림동_' + fileName + '_'+dir+'.csv'
+            try:
+                df = pd.read_csv('./assets/input/' + dir+'/부림동_' +
+                                 fileName + '_'+dir+'.csv')
+            except FileNotFoundError:
+                print("Error: File not found!")
+                continue
+            except pd.errors.EmptyDataError:
+                print("Error: File is empty")
+                continue
+            except Exception as e:
+                print("Error:", str(e))
+                continue
+            print(df)
+            df = df.loc[:, ['timestamp', 'value']]
+            df['Mean'] = df.groupby(['date'])['value'].transfrom('mean')
+
+            allYears = pd.concat([df, allYears])
+
+        allYears.to_csv("./assets/output/부림동_" + fileName + ".csv")
+
+#df['Mean'] = df.groupby(['date'])['value'].transfrom('mean')
+#            df["Mean"] = df.groupby('date')['value'].mean()

@@ -6,6 +6,8 @@ inputDirs = ['2009', '2010', '2011', '2012', '2013', '2014',
              '2015', '2016', '2017', '2017_1', '2018', '2019']
 fileNames = ['6시간강수량', '강수확률', '습도',
              '일최고기온', '일최저기온', '풍속', '풍향', '하늘상태']
+fileNames_eng = ['rainfall', 'probability of precipitation', 'humidity', 'highest temperature', 'lowest temperature',
+                 'wind speed', 'wind direction', 'sky state']
 
 # Read the csv files in the assets/input and merge all of features
 
@@ -43,8 +45,8 @@ def makeVisitor():
     visitor = pd.DataFrame()
     for year in years:
         try:
-            data = pd.read_excel(
-                'assets/input/SGPyear/Visitor_'+year+'.xlsx', skiprows=2, usecols=[0, 5])
+            data = pd.read_csv(
+                'assets/input/SGPyear/Visitor_'+year+'.csv', skiprows=2, usecols=[0, 5])
         except FileNotFoundError:
             print("Error: File not found!")
             continue
@@ -57,6 +59,7 @@ def makeVisitor():
         data.columns = ['date', 'visitor']
         visitor = pd.concat([data, visitor])
     visitor.reset_index(inplace=True, drop=True)
+    visitor.set_index('date', inplace=True)
     visitor.to_csv("assets/output/visitors.csv")
 
 
@@ -96,33 +99,75 @@ def makeAtmosphere():
             continue
 
         atmosphere = pd.concat([df, atmosphere])
-    atmosphere.reset_index(inplace=True, drop=True)
-    atmosphere.to_csv("assets/output/atmosphere.csv", encoding='cp949')
+    
+    group = atmosphere.groupby('date')
+    days = atmosphere['date'].unique()
+    
+    sulfur_dioxide = getGroupDescribe(group['sulfur_dioxide'], 'sulfur_dioxide')
+    carbon_monoxide = getGroupDescribe(group['carbon_monoxide'], 'carbon_monoxide')
+    ozone = getGroupDescribe(group['ozone'], 'ozone')
+    nitrogen_dioxide = getGroupDescribe(group['nitrogen_dioxide'], 'fine_dust_pm10')
+    fine_dust_pm10 = getGroupDescribe(group['fine_dust_pm10'], 'fine_dust_pm10')
+    
+    result = pd.DataFrame({'date' : days})
+    result = pd.concat([result, sulfur_dioxide,carbon_monoxide,ozone,nitrogen_dioxide,fine_dust_pm10], axis=1)
+    result.reset_index(inplace=True, drop=True)
+    result.set_index('date', inplace=True)
+    result.to_csv("assets/output/atmosphere.csv", encoding='cp949')
 
+def getGroupDescribe(group, name):
+    min = group.min().values.ravel()
+    max = group.max().values.ravel()
+    mean = group.mean().values.ravel()
+    median = group.median().values.ravel()
+    std = group.std().values.ravel()
+    
+    result = pd.DataFrame({
+            name+'_min': min,
+            name+'_max': max,
+            name+'_mean': mean,
+            name+'_median': median,
+            name+'_std': std
+        })
+    
+    return result
 
-def addOutputDataset() :
-    for file in fileNames:
+def addOutputDataset():
+    for i, file in enumerate(fileNames):
         df = pd.read_csv('./assets/output/부림동_'+file+'.csv')
         
-        group = df.groupby('timestamp')
         days = df['timestamp'].unique()
         
-        print(days)
+        name = fileNames_eng[i]
+        group = getGroupDescribe(group=df.groupby('timestamp'), name=name)
         
-        min = group.min().values.ravel()
-        max = group.max().values.ravel()
-        mean = group.mean().values.ravel()
-        median = group.median().values.ravel()
-        std = group.std().values.ravel()
         
         temp_df = pd.DataFrame({
             'timestamp': days,
-            'min': min,
-            'max': max,
-            'mean': mean,
-            'median': median,
-            'std': std
         })
+        
+        temp_df = pd.concat([temp_df, group], axis=1)
         
         temp_df.set_index('timestamp', inplace=True)    
         temp_df.to_csv("assets/output/부림동_" + file + ".csv")
+
+def makeFinalResult():
+    result = pd.read_csv('./src/assets/output/atmosphere.csv')
+    
+    for file in fileNames:
+        f = pd.read_csv('./src/assets/output/부림동_'+file+'.csv')
+        f.rename(columns={'timestamp' : 'date'}, inplace=True)
+        
+        
+        result = pd.merge(result, f, how='outer', on='date')
+    
+    week = pd.read_csv('./src/assets/input/WeekSet.csv')
+    result = pd.merge(result, week, how='outer', on='date')
+    target = pd.read_csv('./src/assets/output/visitors.csv')
+    result = pd.merge(result, target, how='right', on='date')
+    
+    print(result)
+    result.set_index('date', inplace=True)    
+    result.to_csv("src/assets/output/finalDataset.csv")
+makeFinalResult()
+    

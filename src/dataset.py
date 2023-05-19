@@ -15,7 +15,6 @@ def mergeForecastDataset():
         allYears = pd.DataFrame()
 
         for dir in inputDirs:
-            str = 'assets/input/' + dir+'/부림동_' + fileName + '_'+dir+'.csv'
             try:
                 df = pd.read_csv('./assets/input/' + dir+'/부림동_' +
                                  fileName + '_'+dir+'.csv')
@@ -29,8 +28,9 @@ def mergeForecastDataset():
                 print("Error:", str(e))
                 continue
             print(df)
-            df = df.loc[:, ['timestamp', 'value']]
+            df = df.loc[:,['timestamp', 'value']]
             allYears = pd.concat([df, allYears])
+        allYears.set_index('timestamp', inplace=True)    
         allYears.to_csv("assets/output/부림동_" + fileName + ".csv")
 
 
@@ -101,30 +101,28 @@ def makeAtmosphere():
 
 
 def addOutputDataset() :
-    for fileName in fileNames:
-        allYears = pd.DataFrame()
-
-        for dir in inputDirs:
-            str = 'assets/input/' + dir+'/부림동_' + fileName + '_'+dir+'.csv'
-            try:
-                df = pd.read_csv('./assets/input/' + dir+'/부림동_' +
-                                 fileName + '_'+dir+'.csv')
-            except FileNotFoundError:
-                print("Error: File not found!")
-                continue
-            except pd.errors.EmptyDataError:
-                print("Error: File is empty")
-                continue
-            except Exception as e:
-                print("Error:", str(e))
-                continue
-            print(df)
-            df = df.loc[:, ['timestamp', 'value']]
-            df['Mean'] = df.groupby(['date'])['value'].transfrom('mean')
-
-            allYears = pd.concat([df, allYears])
-
-        allYears.to_csv("./assets/output/부림동_" + fileName + ".csv")
-
-#df['Mean'] = df.groupby(['date'])['value'].transfrom('mean')
-#            df["Mean"] = df.groupby('date')['value'].mean()
+    for file in fileNames:
+        df = pd.read_csv('./assets/output/부림동_'+file+'.csv')
+        
+        group = df.groupby('timestamp')
+        days = df['timestamp'].unique()
+        
+        print(days)
+        
+        min = group.min().values.ravel()
+        max = group.max().values.ravel()
+        mean = group.mean().values.ravel()
+        median = group.median().values.ravel()
+        std = group.std().values.ravel()
+        
+        temp_df = pd.DataFrame({
+            'timestamp': days,
+            'min': min,
+            'max': max,
+            'mean': mean,
+            'median': median,
+            'std': std
+        })
+        
+        temp_df.set_index('timestamp', inplace=True)    
+        temp_df.to_csv("assets/output/부림동_" + file + ".csv")

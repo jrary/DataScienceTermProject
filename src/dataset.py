@@ -152,22 +152,21 @@ def addOutputDataset():
         temp_df.to_csv("assets/output/부림동_" + file + ".csv")
 
 def makeFinalResult():
-    result = pd.read_csv('./src/assets/output/atmosphere.csv')
+    result = pd.read_csv('./assets/output/atmosphere.csv')
     
     for file in fileNames:
-        f = pd.read_csv('./src/assets/output/부림동_'+file+'.csv')
+        f = pd.read_csv('./assets/output/부림동_'+file+'.csv')
         f.rename(columns={'timestamp' : 'date'}, inplace=True)
         
         
         result = pd.merge(result, f, how='outer', on='date')
     
-    week = pd.read_csv('./src/assets/input/WeekSet.csv')
+    week = pd.read_csv('./assets/input/WeekSet.csv')
     result = pd.merge(result, week, how='outer', on='date')
-    target = pd.read_csv('./src/assets/output/visitors.csv')
+    target = pd.read_csv('./assets/output/visitors.csv')
     result = pd.merge(result, target, how='right', on='date')
     
     print(result)
     result.set_index('date', inplace=True)    
-    result.to_csv("src/assets/output/finalDataset.csv")
-makeFinalResult()
+    result.to_csv("assets/output/finalDataset.csv")
     

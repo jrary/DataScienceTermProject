@@ -106,7 +106,7 @@ def makeAtmosphere():
     sulfur_dioxide = getGroupDescribe(group['sulfur_dioxide'], 'sulfur_dioxide')
     carbon_monoxide = getGroupDescribe(group['carbon_monoxide'], 'carbon_monoxide')
     ozone = getGroupDescribe(group['ozone'], 'ozone')
-    nitrogen_dioxide = getGroupDescribe(group['nitrogen_dioxide'], 'fine_dust_pm10')
+    nitrogen_dioxide = getGroupDescribe(group['nitrogen_dioxide'], 'nitrogen_dioxide')
     fine_dust_pm10 = getGroupDescribe(group['fine_dust_pm10'], 'fine_dust_pm10')
     
     result = pd.DataFrame({'date' : days})

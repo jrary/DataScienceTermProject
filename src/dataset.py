@@ -170,3 +170,67 @@ def makeFinalResult():
     result.set_index('date', inplace=True)    
     result.to_csv("assets/output/finalDataset.csv")
     
+def fillDirtyData():
+    df = pd.read_csv('./assets/output/finalDataset.csv')
+
+    # Fill the NaN value with average value of the same date in the previous year 
+    df['date_md'] = pd.to_datetime(df['date']).dt.strftime('%m-%d')
+    df_filled = df.copy()
+
+    for column in df.columns:
+        if column != 'date' and column != 'date_md':
+            if df[column].isnull().any():
+                df_filled[column].fillna(df.groupby('date_md')[column].transform('mean'), inplace=True)
+
+    df_filled.drop('date_md', axis=1, inplace=True)
+    df_filled.set_index('date', inplace=True)
+
+    df_filled.to_csv("assets/output/preprocessedDataset.csv")
+    
+def discretizeData():
+    df = pd.read_csv('./assets/output/preprocessedDataset.csv')
+    # Rounding contents to integer values
+    # Due to previous processing, datas have become float data
+    df['sky state_min'] = df['sky state_min'].round()
+    df['sky state_max'] = df['sky state_max'].round()
+    df['sky state_mean'] = df['sky state_mean'].round()
+    df['sky state_median'] = df['sky state_median'].round()
+    # Divide the value of the angle into 16 directions
+    df['wind direction_min'] = (df['wind direction_min']/22.5).round()
+    df['wind direction_max'] = (df['wind direction_max']/22.5).round()
+    df['wind direction_mean'] = (df['wind direction_mean']/22.5).round()
+    df['wind direction_median'] = (df['wind direction_median']/22.5).round()
+
+    df['visitor'] = df['visitor'].str.replace(',', '').astype(float)
+
+    df.to_csv("assets/output/preprocessedDataset.csv")
+    
+def encodingData():
+    from sklearn.preprocessing import OneHotEncoder
+    
+    df = pd.read_csv('./assets/output/preprocessedDataset.csv')
+    
+    # Feature creating
+    # Encoding
+    encoded_columns = ['wind direction_min', 'wind direction_max', 'wind direction_mean', 
+                            'wind direction_median', 'sky state_min', 'sky state_max',
+                            'sky state_mean', 'sky state_median', 'weekday']
+    encoder = OneHotEncoder()
+    df_encoded = encoder.fit_transform(df[encoded_columns])
+
+    # Convert encoded data to new dataFrame
+    encoded = pd.DataFrame(df_encoded.toarray(), columns=encoder.get_feature_names_out(encoded_columns))
+
+    # Combine encoded dataFrame with original dataFrame
+    df_encoded = pd.concat([df.drop(columns=encoded_columns), encoded], axis=1)
+    df_encoded.set_index('date', inplace=True)
+
+    # Data normalization
+    # standardScaler
+    from sklearn.preprocessing import StandardScaler
+    for column in df.columns:
+        if column != 'date' and column not in encoded_columns:
+            scaler = StandardScaler()
+            df_encoded[column] = scaler.fit_transform(np.array(df_encoded[column]).reshape(-1, 1))
+
+    df_encoded.to_csv("assets/output/preprocessedDataset.csv")

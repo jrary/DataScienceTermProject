@@ -202,7 +202,7 @@ def discretizeData():
     df['wind direction_median'] = (df['wind direction_median']/22.5).round()
 
     df['visitor'] = df['visitor'].str.replace(',', '').astype(float)
-
+    df.set_index('date', inplace=True)
     df.to_csv("assets/output/preprocessedDataset.csv")
     
 def encodingData():
@@ -212,9 +212,9 @@ def encodingData():
     
     # Feature creating
     # Encoding
-    encoded_columns = ['wind direction_min', 'wind direction_max', 'wind direction_mean', 
-                            'wind direction_median', 'sky state_min', 'sky state_max',
-                            'sky state_mean', 'sky state_median', 'weekday']
+    encoded_columns = ['wind direction_min', 'wind direction_max', 'wind direction_mean', 'wind direction_median', 
+                         # 'sky state_min', 'sky state_max', 'sky state_mean', 'sky state_median', 
+                            'weekday']
     encoder = OneHotEncoder()
     df_encoded = encoder.fit_transform(df[encoded_columns])
 

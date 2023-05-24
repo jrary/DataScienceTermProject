@@ -58,6 +58,7 @@ def makeVisitor():
             continue
         data.columns = ['date', 'visitor']
         visitor = pd.concat([data, visitor])
+    data['visitor'] = data['visitor'].str.replace(',', '').astype(int)
     visitor.reset_index(inplace=True, drop=True)
     visitor.set_index('date', inplace=True)
     visitor.to_csv("assets/output/visitors.csv")
@@ -184,7 +185,7 @@ def fillDirtyData():
 
     df_filled.drop('date_md', axis=1, inplace=True)
     df_filled.set_index('date', inplace=True)
-
+    df_filled['visitor'] = df_filled['visitor'].str.replace(',', '').astype(int)
     df_filled.to_csv("assets/output/preprocessedDataset.csv")
     
 def discretizeData():
@@ -201,13 +202,11 @@ def discretizeData():
     df['wind direction_mean'] = (df['wind direction_mean']/22.5).round()
     df['wind direction_median'] = (df['wind direction_median']/22.5).round()
 
-    df['visitor'] = df['visitor'].str.replace(',', '').astype(float)
     df.set_index('date', inplace=True)
     df.to_csv("assets/output/preprocessedDataset.csv")
     
 def encodingData():
     from sklearn.preprocessing import OneHotEncoder
-    
     df = pd.read_csv('./assets/output/preprocessedDataset.csv')
     
     # Feature creating

@@ -228,7 +228,7 @@ def encodingData():
     # standardScaler
     from sklearn.preprocessing import StandardScaler
     for column in df.columns:
-        if column != 'date' and column not in encoded_columns:
+        if column != 'date' and column not in encoded_columns and column != 'visitor':
             scaler = StandardScaler()
             df_encoded[column] = scaler.fit_transform(np.array(df_encoded[column]).reshape(-1, 1))
 

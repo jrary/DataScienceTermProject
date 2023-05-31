@@ -121,14 +121,14 @@ def getGroupDescribe(group, name):
     max = group.max().values.ravel()
     mean = group.mean().values.ravel()
     median = group.median().values.ravel()
-    std = group.std().values.ravel()
+    # std = group.std().values.ravel()
     
     result = pd.DataFrame({
             name+'_min': min,
             name+'_max': max,
             name+'_mean': mean,
             name+'_median': median,
-            name+'_std': std
+            # name+'_std': std
         })
     
     return result

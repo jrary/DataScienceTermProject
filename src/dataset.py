@@ -182,7 +182,7 @@ def fillDirtyData():
     
     ## 여기서부터 바꿔가면서 진행
     # NaN값 drop
-    df_filled.dropna(thresh = 2)
+    df_filled.dropna(thresh = 4)
     # 이전 값으로 채우기
     # df_filled.fillna(method='bfill')
     # 평균으로 채우기
@@ -193,9 +193,9 @@ def fillDirtyData():
     
     # 날짜별로 합쳤던 column 삭제하는 부분 - 지우면 안됨
     df_filled.drop('date_md', axis=1, inplace=True)
+    df_filled['visitor'] = df_filled['visitor'].str.replace(',', '').astype(int)
     
     # KNN - 사용 안할 시 최종 결과 Dataframe 이름(하단 2줄) df_filled로 수정해야 함
-    df_filled['visitor'] = df_filled['visitor'].str.replace(',', '').astype(int)
     imputer = KNNImputer(n_neighbors=5)  # Choose the number of neighbors according to your dataset
     df_imputed = pd.DataFrame(imputer.fit_transform(df_filled.iloc[:, 1:]), columns=df_filled.columns[1:])
     df_imputed.insert(0, 'date', df_filled['date'])
@@ -226,7 +226,7 @@ def encodingData():
     
     # Feature creating
     # Encoding
-    encoded_columns = [ #'wind direction_min', 'wind direction_max', 
+    encoded_columns = ['wind direction_min', 'wind direction_max', 
                        'wind direction_mean', 'wind direction_median', 
                           'sky state_min', 'sky state_max', 
                          'sky state_mean', 'sky state_median', 

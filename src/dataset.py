@@ -267,14 +267,18 @@ def find_outlier_z(data, featureName):
     return masks
     
 # 연도별 outlier 제거
-def detectOutlierAmongYear(df, featureName):
+# df = pd.read_csv('./src/assets/output/부림동_6시간강수량.csv')
+# print(detectOutlierAmongYear(df, 'rainfall_mean','2017-01-01'  ,'2018-01-01'))
+def detectOutlierAmongYear(df, featureName, startYear, endYear):
     
-    year_df = df[df['timestamp'] < '2018-01-01']
-    year_df = year_df[year_df['timestamp'] >= '2017-01-01']
+    year_df = df[df['timestamp'] >= startYear]
+    year_df = year_df[year_df['timestamp'] < endYear]
     
     result = find_outlier_z(year_df, featureName)
     
     return result
+
+
 
    #Feature Selection based on correlation
    # Correlation기반으로 feature selection

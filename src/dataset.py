@@ -6,9 +6,14 @@ inputDirs = ['2009', '2010', '2011', '2012', '2013', '2014',
              '2015', '2016', '2017', '2017_1', '2018', '2019']
 fileNames = ['6시간강수량', '강수확률', '습도',
              '일최고기온', '일최저기온', '풍속', '풍향', '하늘상태']
+# fileNames = ['6시간강수량', '강수확률', '습도',
+#              '일최고기온', '일최저기온','하늘상태']
 # fileNames = ['습도','일최고기온', '일최저기온']
+
 fileNames_eng = ['rainfall', 'probability of precipitation', 'humidity', 'highest temperature', 'lowest temperature',
                  'wind speed', 'wind direction', 'sky state']
+# fileNames_eng = ['rainfall', 'probability of precipitation', 'humidity', 'highest temperature', 'lowest temperature',
+#                   'sky state']
 # fileNames_eng = ['humidity', 'highest temperature', 'lowest temperature']
 
 # Read the csv files in the assets/input and merge all of features
@@ -65,6 +70,12 @@ def makeVisitor():
     visitor.set_index('date', inplace=True)
     visitor.to_csv("assets/output/visitors.csv")
 
+def visitorProcess():
+    df = pd.read_csv('./assets/output/visitors.csv')
+    
+    df['date'] = pd.to_datetime(df['date'])
+    df['day'] = df['date'].dt.dayofyear
+    df.to_csv('./assets/output/visitors.csv', index=False)
 
 def makeAtmosphere():
     years = ['2008' , '2009', '2010', '2011', '2012', '2013', '2014',
@@ -154,8 +165,28 @@ def addOutputDataset():
         temp_df.set_index('timestamp', inplace=True)    
         temp_df.to_csv("assets/output/부림동_" + file + ".csv")
 
-def makeFinalResult():
+def datasetCombine():
+    # result = pd.read_csv('./assets/output/atmosphere.csv')
+    
+    # for file in fileNames:
+    #     f = pd.read_csv('./assets/output/부림동_'+file+'.csv')
+    #     f.rename(columns={'timestamp' : 'date'}, inplace=True)
+        
+        
+    #     result = pd.merge(result, f, how='outer', on='date')
+    
+    # week = pd.read_csv('./assets/input/WeekSet.csv')
+    # result = pd.merge(result, week, how='outer', on='date')
+    # target = pd.read_csv('./assets/output/visitors.csv')
+    # # target = target.drop(target[target['date'] <= '2017-12-31'].index)
+    # result = pd.merge(result, target, how='right', on='date')
+    
+    # print(result)
+    # result.set_index('date', inplace=True)    
+    # result.to_csv("assets/output/datasetCombine.csv")
+    
     result = pd.read_csv('./assets/output/atmosphere.csv')
+    result = result['date']
     
     for file in fileNames:
         f = pd.read_csv('./assets/output/부림동_'+file+'.csv')
@@ -172,12 +203,12 @@ def makeFinalResult():
     
     print(result)
     result.set_index('date', inplace=True)    
-    result.to_csv("assets/output/finalDataset.csv")
+    result.to_csv("assets/output/datasetCombine.csv")
     
 def fillDirtyData():
     from sklearn.impute import KNNImputer
     
-    df = pd.read_csv('./assets/output/finalDataset.csv')
+    df = pd.read_csv('./assets/output/datasetCombine.csv')
 
     # Fill the NaN value with average value of the same date in the previous year 
     df['date_md'] = pd.to_datetime(df['date']).dt.strftime('%m-%d')
@@ -203,36 +234,37 @@ def fillDirtyData():
     df_imputed = pd.DataFrame(imputer.fit_transform(df_filled.iloc[:, 1:]), columns=df_filled.columns[1:])
     df_imputed.insert(0, 'date', df_filled['date'])
     
-    df_imputed.set_index('date', inplace=True)
-    df_imputed.to_csv("assets/output/preprocessedDataset.csv")
+    df_filled.set_index('date', inplace=True)
+    df_filled.to_csv("assets/output/dirtydataResult.csv")
     
 def discretizeData():
-    df = pd.read_csv('./assets/output/preprocessedDataset.csv')
+    df = pd.read_csv('./assets/output/outlierResult.csv')
     # Rounding contents to integer values
     # Due to previous processing, datas have become float data
     df['sky state_min'] = df['sky state_min'].round()
     df['sky state_max'] = df['sky state_max'].round()
     df['sky state_mean'] = df['sky state_mean'].round()
     df['sky state_median'] = df['sky state_median'].round()
-    # Divide the value of the angle into 16 directions
+    # # Divide the value of the angle into 16 directions
     df['wind direction_min'] = (df['wind direction_min']/22.5).round()
     df['wind direction_max'] = (df['wind direction_max']/22.5).round()
     df['wind direction_mean'] = (df['wind direction_mean']/22.5).round()
     df['wind direction_median'] = (df['wind direction_median']/22.5).round()
 
     df.set_index('date', inplace=True)
-    df.to_csv("assets/output/preprocessedDataset.csv")
+    df.to_csv("assets/output/discretizeResult.csv")
     
-def encodingData():
+def encodingData(scaler):
     from sklearn.preprocessing import OneHotEncoder
-    df = pd.read_csv('./assets/output/preprocessedDataset.csv')
+    df = pd.read_csv('./assets/output/discretizeResult.csv')
     
     # Feature creating
     # Encoding
-    encoded_columns = [ #'wind direction_min', 'wind direction_max', 
-                    #    'wind direction_mean', 'wind direction_median', 
-                    #       'sky state_min', 'sky state_max', 
-                    #      'sky state_mean', 'sky state_median', 
+    encoded_columns = [ 
+                       'wind direction_min', 'wind direction_max', 
+                       'wind direction_mean', 'wind direction_median', 
+                        #   'sky state_min', 'sky state_max', 
+                        #  'sky state_mean', 'sky state_median', 
                             'weekday']
     encoder = OneHotEncoder()
     df_encoded = encoder.fit_transform(df[encoded_columns])
@@ -246,13 +278,14 @@ def encodingData():
 
     # Data normalization
     # standardScaler
-    from sklearn.preprocessing import StandardScaler
+
     for column in df.columns:
         if column != 'date' and column not in encoded_columns and column != 'visitor':
-            scaler = StandardScaler()
             df_encoded[column] = scaler.fit_transform(np.array(df_encoded[column]).reshape(-1, 1))
 
-    df_encoded.to_csv("assets/output/preprocessedDataset.csv")
+    df_encoded.to_csv("assets/output/encodingResult.csv")
+
+# ========= Preprocessing methods =========
 
 def find_outlier_z(data, featureName):
     threshold = 3
@@ -268,19 +301,22 @@ def find_outlier_z(data, featureName):
 
     return masks
 
-# def find_outlier_Turkey(data, featureName):
-#     q1, q3 = np.percentile(data[featureName],[25,75])
-
-#     iqr = q3 - q1
+def find_outlier_Turkey(data, featureName):
+    # q1, q3 = np.percentile(data[featureName],[25,75])
+    # q1 = np.percentile(data[featureName], 25)
+    # q3 = np.percentile(data[featureName], 75)
     
-#     lower_bound = q1 - (iqr*1.5)
-#     upper_bound = q3 + (iqr*1.5)
+    q1 = data[featureName].quantile(0.25)
+    q3 = data[featureName].quantile(0.75)
+    
+    iqr = q3 - q1
+    
+    lower_bound = q1 - (iqr*1.5)
+    upper_bound = q3 + (iqr*1.5)
+    
+    mask = data[(data[featureName] < upper_bound) & (data[featureName] > lower_bound)]
 
-#     # mask = np.where((data>upper_bound)|(data<lower_bound))
-#     mask = data[data[featureName] <= upper_bound]
-#     mask = mask[mask[featureName] >= lower_bound]
-
-#     return mask
+    return mask
     
 # 연도별 outlier 제거
 # df = pd.read_csv('./src/assets/output/부림동_6시간강수량.csv')
@@ -288,22 +324,21 @@ def find_outlier_z(data, featureName):
 def detectOutlierAmongYear(df, featureName, startYear, endYear):
     
     year_df = df[df['date'] >= startYear]
-    year_df = year_df[year_df['date'] < endYear]
+    year_df = year_df[year_df['date'] <= endYear]
     
-    result = find_outlier_z(year_df, featureName)
+    result = find_outlier_Turkey(year_df, featureName)
     
     return result
 
 
-def deleteAllOutlier():
-    df = pd.read_csv('./assets/output/finalDataset.csv')
+def deleteAllOutlier(df):
     for col in df.columns:
         if(col == 'date'):
             continue
         if(col == 'visitor'):
             continue
-        df = detectOutlierAmongYear(df, col, '2008-10-01', '2020-01-31')
-    df.to_csv('./assets/output/finalDataset.csv', index=False)
+        df = find_outlier_z(df, col)
+    df.to_csv('./assets/output/outlierResult.csv', index=False)
     
     
    #Feature Selection based on correlation

@@ -6,8 +6,10 @@ inputDirs = ['2009', '2010', '2011', '2012', '2013', '2014',
              '2015', '2016', '2017', '2017_1', '2018', '2019']
 fileNames = ['6시간강수량', '강수확률', '습도',
              '일최고기온', '일최저기온', '풍속', '풍향', '하늘상태']
+# fileNames = ['습도','일최고기온', '일최저기온']
 fileNames_eng = ['rainfall', 'probability of precipitation', 'humidity', 'highest temperature', 'lowest temperature',
                  'wind speed', 'wind direction', 'sky state']
+# fileNames_eng = ['humidity', 'highest temperature', 'lowest temperature']
 
 # Read the csv files in the assets/input and merge all of features
 
@@ -228,9 +230,9 @@ def encodingData():
     # Feature creating
     # Encoding
     encoded_columns = [ #'wind direction_min', 'wind direction_max', 
-                       'wind direction_mean', 'wind direction_median', 
-                          'sky state_min', 'sky state_max', 
-                         'sky state_mean', 'sky state_median', 
+                    #    'wind direction_mean', 'wind direction_median', 
+                    #       'sky state_min', 'sky state_max', 
+                    #      'sky state_mean', 'sky state_median', 
                             'weekday']
     encoder = OneHotEncoder()
     df_encoded = encoder.fit_transform(df[encoded_columns])
@@ -265,6 +267,20 @@ def find_outlier_z(data, featureName):
     masks = data[np.abs(z_score) < threshold]
 
     return masks
+
+# def find_outlier_Turkey(data, featureName):
+#     q1, q3 = np.percentile(data[featureName],[25,75])
+
+#     iqr = q3 - q1
+    
+#     lower_bound = q1 - (iqr*1.5)
+#     upper_bound = q3 + (iqr*1.5)
+
+#     # mask = np.where((data>upper_bound)|(data<lower_bound))
+#     mask = data[data[featureName] <= upper_bound]
+#     mask = mask[mask[featureName] >= lower_bound]
+
+#     return mask
     
 # 연도별 outlier 제거
 # df = pd.read_csv('./src/assets/output/부림동_6시간강수량.csv')
@@ -294,7 +310,7 @@ def deleteAllOutlier():
    # Correlation기반으로 feature selection
 #    selected_feat = ['sulfur_dioxide_min', 'carbon_monoxide_max', 'ozone_max', 'nitrogen_dioxide_max', 'fine_dust_pm10_max', 'rainfall_mean',   'probability of precipitation_min', 'humidity_min', 'highest temperature_max','lowest temperature_min', 'wind speed_median', 'visitor']
 def featureSelectionBasedOnCorrelation(selected_feat):
-    df = pd.read_csv('./assets/output/preprocessedDataset.csv')
+    df = pd.read_csv('./assets/output/finalDataset.csv')
 
     df_selected = df[selected_feat]
 
@@ -318,7 +334,7 @@ def featureSelectionBasedOnCorrelation(selected_feat):
 
     selected_features = df_selected.iloc[:,highly_correlated_features]
     print(selected_features)
-    result = pd.concat([date, selected_features,week], axis=1)
+    result = pd.concat([date, selected_features,week, target], axis=1)
     result.to_csv('./assets/output/preprocessedDataset.csv', index=False)
 
     

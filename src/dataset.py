@@ -165,6 +165,7 @@ def makeFinalResult():
     week = pd.read_csv('./assets/input/WeekSet.csv')
     result = pd.merge(result, week, how='outer', on='date')
     target = pd.read_csv('./assets/output/visitors.csv')
+    # target = target.drop(target[target['date'] <= '2017-12-31'].index)
     result = pd.merge(result, target, how='right', on='date')
     
     print(result)
@@ -250,3 +251,31 @@ def encodingData():
             df_encoded[column] = scaler.fit_transform(np.array(df_encoded[column]).reshape(-1, 1))
 
     df_encoded.to_csv("assets/output/preprocessedDataset.csv")
+
+def find_outlier_z(data, featureName):
+    threshold = 3
+
+    mean = np.mean(data[featureName])
+    std = np.std(data[featureName])
+
+    z_score = [(y-mean)/std for y in data[featureName]]
+
+    # masks = np.where(np.abs(z_score)>threshold)
+    # print(masks)
+    masks = data[np.abs(z_score) < threshold]
+
+    return masks
+    
+# 연도별 outlier 제거
+def detectOutlierAmongYear(df, featureName):
+    
+    year_df = df[df['timestamp'] < '2018-01-01']
+    year_df = year_df[year_df['timestamp'] >= '2017-01-01']
+    
+    result = find_outlier_z(year_df, featureName)
+    
+    print(result)
+    
+df = pd.read_csv("./src/assets/output/부림동_6시간강수량.csv")
+detectOutlierAmongYear(df, 'rainfall_min')
+    

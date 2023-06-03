@@ -172,21 +172,36 @@ def makeFinalResult():
     result.to_csv("assets/output/finalDataset.csv")
     
 def fillDirtyData():
+    from sklearn.impute import KNNImputer
+    
     df = pd.read_csv('./assets/output/finalDataset.csv')
 
     # Fill the NaN value with average value of the same date in the previous year 
     df['date_md'] = pd.to_datetime(df['date']).dt.strftime('%m-%d')
     df_filled = df.copy()
-
-    for column in df.columns:
-        if column != 'date' and column != 'date_md':
-            if df[column].isnull().any():
-                df_filled[column].fillna(df.groupby('date_md')[column].transform('mean'), inplace=True)
-
+    
+    ## 여기서부터 바꿔가면서 진행
+    # NaN값 drop
+    df_filled.dropna(thresh = 2)
+    # 이전 값으로 채우기
+    # df_filled.fillna(method='bfill')
+    # 평균으로 채우기
+    # for column in df.columns:
+    #     if column != 'date' and column != 'date_md':
+    #         if df[column].isnull().any():
+    #             df_filled[column].fillna(df.groupby('date_md')[column].transform('mean'), inplace=True)
+    
+    # 날짜별로 합쳤던 column 삭제하는 부분 - 지우면 안됨
     df_filled.drop('date_md', axis=1, inplace=True)
-    df_filled.set_index('date', inplace=True)
+    
+    # KNN - 사용 안할 시 최종 결과 Dataframe 이름(하단 2줄) df_filled로 수정해야 함
     df_filled['visitor'] = df_filled['visitor'].str.replace(',', '').astype(int)
-    df_filled.to_csv("assets/output/preprocessedDataset.csv")
+    imputer = KNNImputer(n_neighbors=5)  # Choose the number of neighbors according to your dataset
+    df_imputed = pd.DataFrame(imputer.fit_transform(df_filled.iloc[:, 1:]), columns=df_filled.columns[1:])
+    df_imputed.insert(0, 'date', df_filled['date'])
+    
+    df_imputed.set_index('date', inplace=True)
+    df_imputed.to_csv("assets/output/preprocessedDataset.csv")
     
 def discretizeData():
     df = pd.read_csv('./assets/output/preprocessedDataset.csv')
@@ -211,8 +226,10 @@ def encodingData():
     
     # Feature creating
     # Encoding
-    encoded_columns = ['wind direction_min', 'wind direction_max', 'wind direction_mean', 'wind direction_median', 
-                         # 'sky state_min', 'sky state_max', 'sky state_mean', 'sky state_median', 
+    encoded_columns = [ #'wind direction_min', 'wind direction_max', 
+                       'wind direction_mean', 'wind direction_median', 
+                          'sky state_min', 'sky state_max', 
+                         'sky state_mean', 'sky state_median', 
                             'weekday']
     encoder = OneHotEncoder()
     df_encoded = encoder.fit_transform(df[encoded_columns])

@@ -6,9 +6,8 @@
   <component name="ChangeListManager">
     <list default="true" id="0119e023-ea08-4d41-9697-bc11865794c7" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/OutlierandCorrelation.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/src/OutlierandCorrelation.ipynb" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/ensemble_gradient_boost.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/src/ensemble_gradient_boost.ipynb" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/regression_model.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/src/regression_model.ipynb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/dataVisualization.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/src/dataVisualization.ipynb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/preprocessing.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/src/preprocessing.ipynb" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -54,7 +53,7 @@
       <workItem from="1685641214963" duration="6936000" />
       <workItem from="1685716874988" duration="597000" />
       <workItem from="1685755345260" duration="5797000" />
-      <workItem from="1685765938612" duration="1244000" />
+      <workItem from="1685765938612" duration="3203000" />
     </task>
     <servers />
   </component>

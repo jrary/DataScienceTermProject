@@ -274,8 +274,5 @@ def detectOutlierAmongYear(df, featureName):
     
     result = find_outlier_z(year_df, featureName)
     
-    print(result)
-    
-df = pd.read_csv("./src/assets/output/부림동_6시간강수량.csv")
-detectOutlierAmongYear(df, 'rainfall_min')
+    return result
     

@@ -165,6 +165,7 @@ def makeFinalResult():
     week = pd.read_csv('./assets/input/WeekSet.csv')
     result = pd.merge(result, week, how='outer', on='date')
     target = pd.read_csv('./assets/output/visitors.csv')
+    # target = target.drop(target[target['date'] <= '2017-12-31'].index)
     result = pd.merge(result, target, how='right', on='date')
     
     print(result)
@@ -182,7 +183,7 @@ def fillDirtyData():
     
     ## 여기서부터 바꿔가면서 진행
     # NaN값 drop
-    df_filled.dropna(thresh = 4)
+    df_filled.dropna(thresh = 2)
     # 이전 값으로 채우기
     # df_filled.fillna(method='bfill')
     # 평균으로 채우기
@@ -196,7 +197,7 @@ def fillDirtyData():
     df_filled['visitor'] = df_filled['visitor'].str.replace(',', '').astype(int)
     
     # KNN - 사용 안할 시 최종 결과 Dataframe 이름(하단 2줄) df_filled로 수정해야 함
-    imputer = KNNImputer(n_neighbors=5)  # Choose the number of neighbors according to your dataset
+    imputer = KNNImputer(n_neighbors=5) 
     df_imputed = pd.DataFrame(imputer.fit_transform(df_filled.iloc[:, 1:]), columns=df_filled.columns[1:])
     df_imputed.insert(0, 'date', df_filled['date'])
     
@@ -226,7 +227,7 @@ def encodingData():
     
     # Feature creating
     # Encoding
-    encoded_columns = ['wind direction_min', 'wind direction_max', 
+    encoded_columns = [ #'wind direction_min', 'wind direction_max', 
                        'wind direction_mean', 'wind direction_median', 
                           'sky state_min', 'sky state_max', 
                          'sky state_mean', 'sky state_median', 
@@ -250,3 +251,115 @@ def encodingData():
             df_encoded[column] = scaler.fit_transform(np.array(df_encoded[column]).reshape(-1, 1))
 
     df_encoded.to_csv("assets/output/preprocessedDataset.csv")
+
+def find_outlier_z(data, featureName):
+    threshold = 3
+
+    mean = np.mean(data[featureName])
+    std = np.std(data[featureName])
+
+    z_score = [(y-mean)/std for y in data[featureName]]
+
+    # masks = np.where(np.abs(z_score)>threshold)
+    # print(masks)
+    masks = data[np.abs(z_score) < threshold]
+
+    return masks
+    
+# 연도별 outlier 제거
+def detectOutlierAmongYear(df, featureName):
+    
+    year_df = df[df['timestamp'] < '2018-01-01']
+    year_df = year_df[year_df['timestamp'] >= '2017-01-01']
+    
+    result = find_outlier_z(year_df, featureName)
+    
+    return result
+
+   #Feature Selection based on correlation
+   # Correlation기반으로 feature selection
+#    selected_feat = ['sulfur_dioxide_min', 'carbon_monoxide_max', 'ozone_max', 'nitrogen_dioxide_max', 'fine_dust_pm10_max', 'rainfall_mean',   'probability of precipitation_min', 'humidity_min', 'highest temperature_max','lowest temperature_min', 'wind speed_median', 'visitor']
+def featureSelectionBasedOnCorrelation(selected_feat):
+    df = pd.read_csv('./assets/output/preprocessedDataset.csv')
+
+    df_selected = df[selected_feat]
+
+    target = df['visitor']
+    week = df.filter(regex='week')
+    date = df['date'] 
+    df.drop(['date'], axis=1, inplace=True)
+
+    # Feature Selection based on correlation
+    corr_target = df_selected.corr(method='spearman').iloc[:,-1]
+    corr_target = np.abs(corr_target)
+    # corr_target.drop('visitor', inplace=True)
+
+    print(corr_target)
+
+    threshold = 0.005  # 상관 관계의 임계값 설정
+    highly_correlated_features = []
+    for i,col in enumerate(corr_target):
+        if col > threshold:
+            highly_correlated_features.append(i)
+
+    selected_features = df_selected.iloc[:,highly_correlated_features]
+    print(selected_features)
+    result = pd.concat([date, selected_features,week], axis=1)
+    result.to_csv('./assets/output/preprocessedDataset.csv', index=False)
+
+    
+# #Feature reduction based on features characteristics(PCA)
+# #이거 사용하면 성능이 더 떨어집니다. 주석 해놓고 필요할때 수정해서 쓰세요
+def featureReductionBasedOnCharacter():
+    from sklearn.decomposition import PCA
+
+    df = pd.read_csv('./assets/output/preprocessedDataset.csv')
+    target = df['visitor']
+    date = df['date']
+    df.drop(['date'], axis=1, inplace=True)
+
+    characters = ['sulfur', 'carbon', 'nitrogen', 'ozone',  'pm10','rainfall', 'highest temperature', 'lowest temperature','precipitation', 'humidity']
+    char_cols = [df.loc[:,df.columns.str.contains(char)]for char in characters]
+
+
+    pca_results = pd.DataFrame()
+    for idx, char_col in enumerate(char_cols):
+        pca = PCA(.95)
+        pca_result = pca.fit_transform(char_col)
+        pca_dataframe = pd.DataFrame(pca_result, columns=[characters[idx] +'_' + str(i) for i in range(pca_result.shape[1])])
+        # pca_dataframe.set_index(pca_dataframe.columns[0], inplace=True)
+        pca_results = pd.concat([pca_results, pca_dataframe], axis=1)
+
+    print(pca_results)
+
+    # for idx, pca_result in enumerate(pca_results):
+    #     pca_df = pd.concat([pca_df, pca_result], axis=1)
+    pca_df = pd.concat([date, pca_results,target], axis=1)
+
+    pca_df.to_csv('./assets/output/pca.csv', index=False)
+    
+# # Feature Selection based on PCA
+def doPCA():
+    from sklearn.decomposition import PCA
+
+    df = pd.read_csv('./assets/output/preprocessedDataset.csv')
+
+    target = df['visitor']
+    date = df['date'] 
+    df.drop(['date', 'visitor'], axis=1, inplace=True)
+
+    pca = PCA(.95)
+    pca.fit(np.array(df, dtype=object))
+
+    df_pca = pca.transform(df)
+    df_pca = pd.DataFrame(df_pca)
+
+    result = pd.concat([date, df_pca, target], axis=1)
+    result.to_csv('./assets/output/preprocessedDataset.csv', index=False)
+    
+def dataSelectionByCondition(feature, threshold):
+    df = pd.read_csv('./assets/output/preprocessedDataset.csv')
+
+    df.drop(df[df[feature] > threshold].index, inplace=True)
+
+    df.to_csv('./assets/output/preprocessedDataset.csv', index=False)

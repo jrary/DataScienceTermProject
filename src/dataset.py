@@ -271,15 +271,25 @@ def find_outlier_z(data, featureName):
 # print(detectOutlierAmongYear(df, 'rainfall_mean','2017-01-01'  ,'2018-01-01'))
 def detectOutlierAmongYear(df, featureName, startYear, endYear):
     
-    year_df = df[df['timestamp'] >= startYear]
-    year_df = year_df[year_df['timestamp'] < endYear]
+    year_df = df[df['date'] >= startYear]
+    year_df = year_df[year_df['date'] < endYear]
     
     result = find_outlier_z(year_df, featureName)
     
     return result
 
 
-
+def deleteAllOutlier():
+    df = pd.read_csv('./assets/output/finalDataset.csv')
+    for col in df.columns:
+        if(col == 'date'):
+            continue
+        if(col == 'visitor'):
+            continue
+        df = detectOutlierAmongYear(df, col, '2008-10-01', '2020-01-31')
+    df.to_csv('./assets/output/finalDataset.csv', index=False)
+    
+    
    #Feature Selection based on correlation
    # Correlation기반으로 feature selection
 #    selected_feat = ['sulfur_dioxide_min', 'carbon_monoxide_max', 'ozone_max', 'nitrogen_dioxide_max', 'fine_dust_pm10_max', 'rainfall_mean',   'probability of precipitation_min', 'humidity_min', 'highest temperature_max','lowest temperature_min', 'wind speed_median', 'visitor']

@@ -166,27 +166,7 @@ def addOutputDataset():
         temp_df.to_csv("assets/output/부림동_" + file + ".csv")
 
 def datasetCombine():
-    # result = pd.read_csv('./assets/output/atmosphere.csv')
-    
-    # for file in fileNames:
-    #     f = pd.read_csv('./assets/output/부림동_'+file+'.csv')
-    #     f.rename(columns={'timestamp' : 'date'}, inplace=True)
-        
-        
-    #     result = pd.merge(result, f, how='outer', on='date')
-    
-    # week = pd.read_csv('./assets/input/WeekSet.csv')
-    # result = pd.merge(result, week, how='outer', on='date')
-    # target = pd.read_csv('./assets/output/visitors.csv')
-    # # target = target.drop(target[target['date'] <= '2017-12-31'].index)
-    # result = pd.merge(result, target, how='right', on='date')
-    
-    # print(result)
-    # result.set_index('date', inplace=True)    
-    # result.to_csv("assets/output/datasetCombine.csv")
-    
     result = pd.read_csv('./assets/output/atmosphere.csv')
-    result = result['date']
     
     for file in fileNames:
         f = pd.read_csv('./assets/output/부림동_'+file+'.csv')
@@ -204,6 +184,26 @@ def datasetCombine():
     print(result)
     result.set_index('date', inplace=True)    
     result.to_csv("assets/output/datasetCombine.csv")
+    
+    # result = pd.read_csv('./assets/output/atmosphere.csv')
+    # result = result['date']
+    
+    # for file in fileNames:
+    #     f = pd.read_csv('./assets/output/부림동_'+file+'.csv')
+    #     f.rename(columns={'timestamp' : 'date'}, inplace=True)
+        
+        
+    #     result = pd.merge(result, f, how='outer', on='date')
+    
+    # week = pd.read_csv('./assets/input/WeekSet.csv')
+    # result = pd.merge(result, week, how='outer', on='date')
+    # target = pd.read_csv('./assets/output/visitors.csv')
+    # # target = target.drop(target[target['date'] <= '2017-12-31'].index)
+    # result = pd.merge(result, target, how='right', on='date')
+    
+    # print(result)
+    # result.set_index('date', inplace=True)    
+    # result.to_csv("assets/output/datasetCombine.csv")
     
 def fillDirtyData():
     from sklearn.impute import KNNImputer
@@ -281,6 +281,7 @@ def encodingData(scaler):
 
     for column in df.columns:
         if column != 'date' and column not in encoded_columns and column != 'visitor':
+        # if column != 'date' and column not in encoded_columns and column != 'visitor' and column != 'day':    
             df_encoded[column] = scaler.fit_transform(np.array(df_encoded[column]).reshape(-1, 1))
 
     df_encoded.to_csv("assets/output/encodingResult.csv")

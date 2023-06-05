@@ -10,8 +10,8 @@ fileNames = ['6시간강수량', '강수확률', '습도',
 fileNames_eng = ['rainfall', 'probability of precipitation', 'humidity', 'highest temperature', 'lowest temperature',
                  'wind speed', 'wind direction', 'sky state']
 
+# [mergeForecastDataset]
 # Read the csv files in the assets/input and merge all of features
-
 # Merge the each forecast dataset to one csv file
 def mergeForecastDataset():
     for fileName in fileNames:
@@ -40,7 +40,8 @@ def mergeForecastDataset():
         allYears.set_index('timestamp', inplace=True)    
         allYears.to_csv("assets/output/부림동_" + fileName + ".csv")
 
-# Make the visitor dataset
+# [makeVisitor]
+# Method for Make the visitor dataset
 def makeVisitor():
     years = ['2008', '2009', '2010', '2011', '2012', '2013', '2014',
          '2015', '2016', '2017', '2018', '2019', '2020']
@@ -71,7 +72,8 @@ def makeVisitor():
     visitor.set_index('date', inplace=True)
     visitor.to_csv("assets/output/visitors.csv")
 
-# Make day of year data
+# [visitorProcess]
+# Method for Make day of year data
 def visitorProcess():
     df = pd.read_csv('./assets/output/visitors.csv')
     
@@ -79,7 +81,8 @@ def visitorProcess():
     df['day'] = df['date'].dt.dayofyear
     df.to_csv('./assets/output/visitors.csv', index=False)
 
-# Make the atmosphere dataset
+# [makeAtmosphere]
+# Method for make the atmosphere dataset
 def makeAtmosphere():
     # Define the years in reverse order
     years = ['2008', '2009', '2010', '2011', '2012', '2013', '2014',

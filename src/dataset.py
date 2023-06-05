@@ -6,15 +6,9 @@ inputDirs = ['2009', '2010', '2011', '2012', '2013', '2014',
              '2015', '2016', '2017', '2017_1', '2018', '2019']
 fileNames = ['6시간강수량', '강수확률', '습도',
              '일최고기온', '일최저기온', '풍속', '풍향', '하늘상태']
-# fileNames = ['6시간강수량', '강수확률', '습도',
-#              '일최고기온', '일최저기온','하늘상태']
-# fileNames = ['습도','일최고기온', '일최저기온']
 
 fileNames_eng = ['rainfall', 'probability of precipitation', 'humidity', 'highest temperature', 'lowest temperature',
                  'wind speed', 'wind direction', 'sky state']
-# fileNames_eng = ['rainfall', 'probability of precipitation', 'humidity', 'highest temperature', 'lowest temperature',
-#                   'sky state']
-# fileNames_eng = ['humidity', 'highest temperature', 'lowest temperature']
 
 # Read the csv files in the assets/input and merge all of features
 
@@ -184,26 +178,7 @@ def datasetCombine():
     print(result)
     result.set_index('date', inplace=True)    
     result.to_csv("assets/output/datasetCombine.csv")
-    
-    # result = pd.read_csv('./assets/output/atmosphere.csv')
-    # result = result['date']
-    
-    # for file in fileNames:
-    #     f = pd.read_csv('./assets/output/부림동_'+file+'.csv')
-    #     f.rename(columns={'timestamp' : 'date'}, inplace=True)
-        
-        
-    #     result = pd.merge(result, f, how='outer', on='date')
-    
-    # week = pd.read_csv('./assets/input/WeekSet.csv')
-    # result = pd.merge(result, week, how='outer', on='date')
-    # target = pd.read_csv('./assets/output/visitors.csv')
-    # # target = target.drop(target[target['date'] <= '2017-12-31'].index)
-    # result = pd.merge(result, target, how='right', on='date')
-    
-    # print(result)
-    # result.set_index('date', inplace=True)    
-    # result.to_csv("assets/output/datasetCombine.csv")
+
     
 def fillDirtyData():
     from sklearn.impute import KNNImputer

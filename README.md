@@ -8,9 +8,12 @@
 3. [서울대공원 일일입장객수 정보](http://data.seoul.go.kr/dataList/OA-15386/F/1/datasetView.do)
 
 ## How to run?
-Just run these source codes.
+Just run these files.
 * ensemble_gradient_boost.ipynb
 * regression_model.ipynb
+
+## Architecture
+![](https://github.com/wooing1084/DataScienceTermProject/blob/main/imgs/architecture_overall.png?raw=true)
 
 ## Used algorithms
 
@@ -19,4 +22,14 @@ Generalized Additive Model (GAM)
 ### Ensemble Learning
 Gradient boosting Regressor
 
+## Result
+* Optimal hyperparameter
+  * n_estimators : 200
+  * max_depth : 3
+  * learning_rate : 0.1
+* Feature importance
+![](https://github.com/wooing1084/DataScienceTermProject/assets/32007781/8bf2be4b-54dd-44be-95ac-edef77eee974)
+* Accuracy
+
+![](https://github.com/wooing1084/DataScienceTermProject/blob/main/imgs/Ensemble_accuracy.png?raw=true)
 

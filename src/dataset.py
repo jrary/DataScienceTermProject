@@ -42,6 +42,8 @@ def mergeForecastDataset():
 
 # [makeVisitor]
 # Method for Make the visitor dataset
+# Input the csv files in the assets that contain the visitor data
+# Contract the date and visitor columns and write the result to csv file
 def makeVisitor():
     years = ['2008', '2009', '2010', '2011', '2012', '2013', '2014',
          '2015', '2016', '2017', '2018', '2019', '2020']
@@ -83,6 +85,8 @@ def visitorProcess():
 
 # [makeAtmosphere]
 # Method for make the atmosphere dataset
+# Input the csv files in the assets that contain the atmosphere data
+# Contract the useful features and write the result to csv file
 def makeAtmosphere():
     # Define the years in reverse order
     years = ['2008', '2009', '2010', '2011', '2012', '2013', '2014',

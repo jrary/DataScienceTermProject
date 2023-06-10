@@ -12,6 +12,10 @@ Just run these files.
 * ensemble_gradient_boost.ipynb
 * regression_model.ipynb
 
+## Business objective
+When people go out with their family or friends, people often go to amusement parks. However, there are so many people that you may not be able to ride the rides you want to ride or see what you want to see. The word "눈치게임" has even been coined to avoid this situation. We identified these problems and planned an amusement park visitor prediction model to provide convenience to people.
+
+
 ## Architecture
 ![](https://github.com/wooing1084/DataScienceTermProject/blob/main/imgs/architecture_overall.png?raw=true)
 
@@ -23,13 +27,38 @@ Generalized Additive Model (GAM)
 Gradient boosting Regressor
 
 ## Result
-* Optimal hyperparameter
-  * n_estimators : 200
-  * max_depth : 3
-  * learning_rate : 0.1
-* Feature importance
-![](https://github.com/wooing1084/DataScienceTermProject/assets/32007781/8bf2be4b-54dd-44be-95ac-edef77eee974)
-* Accuracy
+<details>
+ <summary> Optimal hyperparameter </summary>
+ n_estimators : 200, max_depth : 3, learning_rate : 0.1
+ </details>
 
-![](https://github.com/wooing1084/DataScienceTermProject/blob/main/imgs/Ensemble_accuracy.png?raw=true)
 
+<details>
+ <summary> Feature importances </summary>
+ <img class="fit-picture" src="https://github.com/wooing1084/DataScienceTermProject/assets/32007781/8bf2be4b-54dd-44be-95ac-edef77eee974">
+ 
+ </details>
+ 
+<details>
+ <summary> Accuracy </summary>
+ <img class="fit-picture" src="https://github.com/wooing1084/DataScienceTermProject/blob/main/imgs/Ensemble_accuracy.png?raw=true">
+ 
+ </details>
+
+## Conclusion
+The prediction accuracy is about 70 percent, so we think we can roughly see how much it comes numerically. However, We think it is a little difficult to know the degree of congestion by figures alone. Therefore, it would be more helpful if we created a congestion level.
+<details>
+<summary>Improvements</summary>
+There were some improvements to be made while carrying out this project. Most of these were data set issues, including.
+1.	In the past, many people visited Seoul Grand Park, but the number of visitors decreased over time. This phenomenon has led to a data imbalance.
+  
+
+2.	It does not properly reflect the expected days of many visitors, such as holidays and Children's Day. Although the day of year value was added to reflect this, it was not accurately reflected.
+ 
+
+3.	No visitor data has been collected after the pendemic. The official Endemic Declaration has only been issued relatively recently. Therefore, the most recent trend was not reflected.
+
+
+4.	Information about the park or surrounding events was not reflected. In the case of large parks, the number of visitors varies greatly depending on the event, but data could not be collected.
+
+</details>
